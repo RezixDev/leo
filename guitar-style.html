@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guitar Style Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-4">
+    <div class="max-w-lg mx-auto bg-white p-4 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold text-center mb-4">Guitar Style Finder</h1>
+
+        <div class="flex gap-2 mb-4">
+            <button id="useCameraBtn"
+                class="flex-1 bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 active">Use
+                Camera</button>
+            <button id="useUploadBtn"
+                class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-300">Use Photos</button>
+        </div>
+
+        <div id="uploadContainer" class="hidden mb-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div id="guitarUpload"
+                    class="border-2 border-dashed border-green-500 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div class="text-2xl mb-2">🎸</div>
+                    <p>Upload Custom Guitar</p>
+                    <input type="file" class="hidden file-input" id="guitarFileInput" accept="image/*">
+                </div>
+                <div id="backgroundUpload"
+                    class="border-2 border-dashed border-green-500 rounded-lg p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors">
+                    <div class="text-2xl mb-2">🖼️</div>
+                    <p>Upload Background</p>
+                    <input type="file" class="hidden file-input" id="backgroundFileInput" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <p id="instructionsText" class="text-center text-gray-600 text-sm mb-4">Align yourself with the guide and take a
+            photo!</p>
+
+        <div class="camera-section relative mb-4">
+            <div class="relative bg-black rounded-lg overflow-hidden aspect-[9/16]">
+                <video id="video" class="w-full h-full object-cover" autoplay playsinline></video>
+                <canvas id="canvas" class="hidden w-full h-full object-cover"></canvas>
+                <img id="backgroundOverlay" class="hidden absolute inset-0 w-full h-full object-cover" alt="background">
+                <img id="guitarOverlay"
+                    class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] pointer-events-none"
+                    alt="guitar overlay">
+
+                <div class="posture-guide hidden absolute inset-0 bg-black/30">
+                    <svg class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] h-[95%]"
+                        viewBox="0 0 200 400">
+                        <circle cx="100" cy="60" r="25" class="fill-none stroke-white stroke-2" />
+                        <path d="M100 85 L100 110" class="fill-none stroke-white stroke-2" />
+                        <path d="M100 110 L60 120 M100 110 L140 120" class="fill-none stroke-white stroke-2" />
+                        <path d="M60 120 L45 180 L40 230" class="fill-none stroke-white stroke-2" />
+                        <path d="M140 120 L155 200 L160 250" class="fill-none stroke-white stroke-2" />
+                        <path d="M100 110 L100 250" class="fill-none stroke-white stroke-2" />
+                        <path d="M60 120 C60 180, 100 200, 100 250" class="fill-none stroke-white stroke-2" />
+                        <path d="M140 120 C140 180, 100 200, 100 250" class="fill-none stroke-white stroke-2" />
+                        <path d="M100 250 L80 380" class="fill-none stroke-white stroke-2" />
+                        <path d="M100 250 L120 380" class="fill-none stroke-white stroke-2" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls grid grid-cols-2 gap-2 mb-4">
+            <button id="startCamera"
+                class="col-span-2 bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600">Start
+                Camera</button>
+            <button id="takePhoto"
+                class="hidden col-span-2 bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600">Take
+                Photo</button>
+            <button id="retake"
+                class="hidden col-span-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Retake
+                Photo</button>
+            <button id="toggleGuide"
+                class="col-span-2 bg-purple-500 text-white px-4 py-2 rounded-full hover:bg-purple-600">Show Posture
+                Guide</button>
+            <button id="switchCamera"
+                class="hidden col-span-2 bg-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-600">Switch
+                Camera</button>
+            <button id="toggleSound"
+                class="col-span-2 bg-purple-500 text-white px-4 py-2 rounded-full hover:bg-purple-600">Enable Sound
+                Trigger</button>
+        </div>
+
+        <div id="soundLevel" class="hidden h-5 bg-gray-200 rounded-full overflow-hidden mb-4">
+            <div class="meter-fill h-full bg-purple-500 transition-all duration-100"></div>
+        </div>
+
+        <div class="guitar-options hidden grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            <div class="guitar-option custom-option hidden p-2 rounded-lg cursor-pointer hover:shadow-lg transition-all"
+                data-guitar="custom">
+                <img src="" alt="Custom Guitar" class="w-full h-auto">
+                <p class="text-center mt-2 text-sm">Custom Guitar</p>
+            </div>
+            <div class="guitar-option p-2 rounded-lg cursor-pointer hover:shadow-lg transition-all"
+                data-guitar="fender">
+                <img src="images/fender.png" alt="Fender Style" class="w-full h-auto">
+                <p class="text-center mt-2 text-sm">Fender</p>
+            </div>
+            <div class="guitar-option p-2 rounded-lg cursor-pointer hover:shadow-lg transition-all"
+                data-guitar="gibson">
+                <img src="images/gibson.png" alt="Gibson Style" class="w-full h-auto">
+                <p class="text-center mt-2 text-sm">Gibson</p>
+            </div>
+            <div class="guitar-option p-2 rounded-lg cursor-pointer hover:shadow-lg transition-all"
+                data-guitar="acoustic">
+                <img src="images/acoustic.png" alt="Acoustic Style" class="w-full h-auto">
+                <p class="text-center mt-2 text-sm">Acoustic</p>
+            </div>
+            <div class="guitar-option p-2 rounded-lg cursor-pointer hover:shadow-lg transition-all"
+                data-guitar="flying_v">
+                <img src="images/flying_v.png" alt="Flying V Style" class="w-full h-auto">
+                <p class="text-center mt-2 text-sm">Flying V</p>
+            </div>
+        </div>
+
+        <div class="controls-panel hidden bg-gray-50 p-4 rounded-lg mb-4">
+            <h3 class="font-bold mb-4">Guitar Controls</h3>
+            <div class="space-y-4">
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Size</label>
+                    <input type="range" id="sizeSlider" min="10" max="200" value="100"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Left/Right Position</label>
+                    <input type="range" id="xPosSlider" min="0" max="100" value="50"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Up/Down Position</label>
+                    <input type="range" id="yPosSlider" min="0" max="100" value="50"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Rotation</label>
+                    <input type="range" id="rotationSlider" min="-180" max="180" value="0"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+        </div>
+
+        <div class="background-controls hidden bg-gray-50 p-4 rounded-lg">
+            <h3 class="font-bold mb-4">Background Controls</h3>
+            <div class="space-y-4">
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Size</label>
+                    <input type="range" id="bgSizeSlider" min="100" max="200" value="100"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Left/Right Position</label>
+                    <input type="range" id="bgXPosSlider" min="0" max="100" value="50"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="slider-control">
+                    <label class="block mb-2 font-medium">Up/Down Position</label>
+                    <input type="range" id="bgYPosSlider" min="0" max="100" value="50"
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

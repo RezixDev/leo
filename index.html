@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 Alles Gute zum Geburtstag Leona! 🎉</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 100%;
+            padding: 15px;
+            background-color: #f8e6ff;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+        }
+
+        h1 {
+            color: #9933cc;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            font-size: 1.8em;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .audio-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .audio-player {
+            width: 100%;
+            margin: 10px 0;
+            height: 40px;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        @media (min-width: 768px) {
+            .links {
+                flex-direction: row;
+                justify-content: center;
+                gap: 20px;
+            }
+        }
+
+        a {
+            display: inline-block;
+            width: 100%;
+            max-width: 300px;
+            padding: 12px 20px;
+            background-color: #9933cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        @media (min-width: 768px) {
+            a {
+                width: auto;
+            }
+        }
+
+        a:hover,
+        a:active {
+            background-color: #7722aa;
+            transform: scale(1.05);
+        }
+
+        .birthday-wish {
+            font-size: 1.1em;
+            color: #666;
+            margin: 15px 0;
+            line-height: 1.6;
+            padding: 0 10px;
+        }
+
+        .decoration {
+            font-size: 1.5em;
+            margin: 15px 0;
+        }
+
+        @media (min-width: 768px) {
+            .decoration {
+                font-size: 2em;
+                margin: 20px 0;
+            }
+        }
+
+        /* Verbesserte Touch-Bereiche für mobile Geräte */
+        audio::-webkit-media-controls-panel {
+            padding: 5px;
+        }
+
+        /* Anpassungen für Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            .audio-container {
+                background-color: #2a2a2a;
+                color: white;
+            }
+
+            .birthday-wish {
+                color: #e0e0e0;
+            }
+
+            body {
+                background-color: #1a1a1a;
+            }
+
+            h1 {
+                color: #bb66ee;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="decoration">🎸 🌟 🎵</div>
+    <h1>Alles Gute zum Geburtstag, Leona!</h1>
+
+    <p class="birthday-wish">
+        Möge dein Tag voller Musik, Freude und wunderbarer Momente sein!
+    </p>
+
+    <div class="audio-container">
+        <h2>Geburtstagslied Rock Version</h2>
+        <audio class="audio-player" controls>
+            <source src="music/rock.mp3" type="audio/mpeg">
+            Dein Browser unterstützt das Audio-Element nicht.
+        </audio>
+    </div>
+
+    <div class="audio-container">
+        <h2>Geburtstagslied Rap Version</h2>
+        <audio class="audio-player" controls>
+            <source src="music/rap.mp3" type="audio/mpeg">
+            Dein Browser unterstützt das Audio-Element nicht.
+        </audio>
+    </div>
+
+    <div class="links">
+        <a href="https://rezixdev.github.io/guitar-tab/" target="_blank">Gitarren Website</a>
+        <a href="guitar-style.html" target="_blank">Fashion Style Guitar Picker</a>
+    </div>
+
+    <div class="decoration">🎂 🎁 🎈</div>
+</body>
+
+</html>
