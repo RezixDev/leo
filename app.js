@@ -1,5 +1,5 @@
 class SoundDetector {
-    constructor(threshold = 0.2) {
+    constructor(threshold = 0.4) { // Increased threshold for better mobile detection
         this.audioContext = null;
         this.mediaStreamSource = null;
         this.analyzer = null;
@@ -8,6 +8,8 @@ class SoundDetector {
         this.callback = null;
         this.meterElement = document.querySelector('.meter-fill');
         this.stream = null;
+        this.lastTriggerTime = 0;
+        this.cooldownPeriod = 1000; // 1 second cooldown between triggers
     }
 
     async init() {
@@ -17,10 +19,16 @@ class SoundDetector {
             }
             
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            this.stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                    autoGainControl: false
+                }
+            });
             this.mediaStreamSource = this.audioContext.createMediaStreamSource(this.stream);
             this.analyzer = this.audioContext.createAnalyser();
-            this.analyzer.fftSize = 256;
+            this.analyzer.fftSize = 1024; // Increased for better accuracy
             this.mediaStreamSource.connect(this.analyzer);
             this.isEnabled = true;
             this.monitor();
@@ -28,10 +36,6 @@ class SoundDetector {
             console.error('Error initializing audio:', err);
             alert('Unable to access microphone. Please ensure microphone permissions are granted.');
         }
-    }
-
-    setCallback(callback) {
-        this.callback = callback;
     }
 
     monitor() {
@@ -49,7 +53,11 @@ class SoundDetector {
                 this.meterElement.style.width = `${normalizedValue * 100}%`;
             }
 
-            if (normalizedValue > this.threshold && this.callback) {
+            const currentTime = Date.now();
+            if (normalizedValue > this.threshold && 
+                currentTime - this.lastTriggerTime > this.cooldownPeriod && 
+                this.callback) {
+                this.lastTriggerTime = currentTime;
                 this.callback();
             }
 
@@ -57,6 +65,11 @@ class SoundDetector {
         };
         update();
     }
+    setCallback(callback) {
+        this.callback = callback;
+    }
+
+
 
     stop() {
         this.isEnabled = false;
@@ -238,7 +251,7 @@ class FileUploadManager {
     }
 
   
- handleBackgroundFile(file) {
+    handleBackgroundFile(file) {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -246,6 +259,15 @@ class FileUploadManager {
                 img.onload = () => {
                     this.backgroundOverlay.src = e.target.result;
                     this.backgroundOverlay.style.display = 'block';
+                    
+                    // Reset background position and sizing
+                    this.backgroundOverlay.style.position = 'absolute';
+                    this.backgroundOverlay.style.left = '50%';
+                    this.backgroundOverlay.style.top = '50%';
+                    this.backgroundOverlay.style.transform = 'translate(-50%, -50%)';
+                    this.backgroundOverlay.style.width = '100%';
+                    this.backgroundOverlay.style.height = '100%';
+                    this.backgroundOverlay.style.objectFit = 'cover';
                     
                     // Show background controls
                     this.backgroundControls.style.display = 'block';
@@ -260,10 +282,6 @@ class FileUploadManager {
                     const canvas = document.getElementById('canvas');
                     if (video) video.style.display = 'none';
                     if (canvas) canvas.style.display = 'none';
-                    
-                    // Update background position
-                    const event = new Event('input');
-                    document.getElementById('bgSizeSlider').dispatchEvent(event);
                 };
                 img.src = e.target.result;
             };
@@ -272,6 +290,9 @@ class FileUploadManager {
             alert('Please upload an image file.');
         }
     }
+
+
+
 }
 
 
@@ -281,6 +302,71 @@ document.addEventListener('DOMContentLoaded', () => {
     const soundDetector = new SoundDetector(0.3);
     const fileUploadManager = new FileUploadManager('guitarFileInput', 'backgroundFileInput');
 
+    const videoContainer = document.querySelector('.camera-section');
+    const controlsPanel = document.querySelector('.controls-panel');
+    videoContainer.parentNode.insertBefore(controlsPanel, videoContainer.nextSibling);
+
+    controlsPanel.classList.add('mt-4', 'mb-4');
+    const controlLabels = {
+        sizeSlider: 'Size',
+        xPosSlider: 'Left/Right Position',
+        yPosSlider: 'Up/Down Position',
+        rotationSlider: 'Rotation'
+    };
+
+    Object.entries(controlLabels).forEach(([id, label]) => {
+        const slider = document.getElementById(id);
+        if (slider) {
+            const labelElement = slider.previousElementSibling;
+            if (labelElement) {
+                labelElement.textContent = label;
+                labelElement.classList.add('font-bold', 'text-lg', 'mb-2');
+            }
+        }
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+        .controls-panel {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slider-control {
+            margin-bottom: 1.5rem;
+        }
+
+        .slider-control:last-child {
+            margin-bottom: 0;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e9ecef;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .meter-fill {
+            transition: width 100ms ease-out;
+        }
+    `;
+    document.head.appendChild(style);
+    
     const elements = {
         video: document.getElementById('video'),
         canvas: document.getElementById('canvas'),
